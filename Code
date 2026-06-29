@@ -1,0 +1,64 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+file_path = ('/content/drive/MyDrive/DataScience Projects/Zomato data.csv')
+data=pd.read_csv(file_path ,lineterminator='\n', on_bad_lines='skip')
+df=pd.DataFrame(data)
+display(df.head())
+display(df.tail())
+
+#Checking te Dataset
+df.info()
+df.describe()
+df.isnull().sum()
+df.duplicated()
+
+# Extracting the information from Dataset
+
+# What type of restaurant do the majority of customers order from?
+
+costumer_order=df["listed_in(type)"].value_counts().reset_index()
+costumer_order.columns = ['costumer_order', 'Total Orders/Listings']
+print("Answer 1: Majority of customers order from:")
+display(costumer_order.style.hide(axis="index"))
+
+# What type of restaurant do the majority of customers order from?
+costumer_order=df["listed_in(type)"].value_counts().reset_index()
+costumer_order.columns = ['costumer_order', 'Total Orders/Listings']
+print("Answer 1: Majority of customers order from:")
+display(costumer_order.style.hide(axis="index"))
+
+# How many votes has each type of restaurant received from customers?
+vote=df.groupby("listed_in(type)")["votes"].sum().reset_index()
+vote.columns=["Resturant_Type","Total_Votes"]
+vote= vote.sort_values(by='Total_Votes', ascending=False)
+print("Answer 2: Total votes by restaurant type:")
+display(vote.style.hide(axis='index'))
+sns.barplot(x="Resturant_Type", y="Total_Votes", data=vote, palette="viridis")
+plt.title("Total Votes by Restaurant Type", fontsize=16, fontweight="bold")
+plt.xlabel("Restaurant Type", fontsize=12)
+plt.ylabel("Total Votes", fontsize=12)
+
+# What are the ratings that the majority of restaurants have received?
+ratings_count = df['rate'].value_counts().reset_index()
+ratings_count.columns = ['Rating', 'Restaurant Count']
+print("Answer 3: Top 5 Ratings received by majority of restaurants:")
+display(ratings_count.head(5).style.hide(axis='index'))
+plt.pie(data=ratings_count.head(),x="Restaurant Count",labels="Rating")
+# Zomato has observed that most couples order most of their food online. What is their average spending on each order?
+avg_spend=df[df["online_order"]=="Yes"]
+avg_order=avg_spend["approx_cost(for two people)"].mean()
+print("Average spending on online orders:")
+print(avg_order.round(2))
+# Which mode (online or offline) has received the maximum rating?
+max_rating_mode = df.groupby('online_order')['rate'].max().reset_index()
+max_rating_mode.column=['Online Order (Mode)', 'Maximum Rating']
+print("Answer 5: Maximum rating received by each mode:")
+display(max_rating_mode.style.hide(axis='index'))
+
+# Which type of restaurant received more offline orders, so that Zomato can provide those customers with some good offers?
+offline_order = df[df["online_order"] == "No"]
+restro = offline_order["listed_in(type)"].value_counts().reset_index()
+restro.columns = ['Restaurant Type', 'Offline Orders Count']
+print("Answer 6: Restaurant types with most offline orders:")
+display(restro.style.hide(axis='index'))
